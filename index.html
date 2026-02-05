@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ProFit Ultra Elite</title>
+    
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2548/2548530.png">
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/2548/2548530.png">
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap');
+
+        :root {
+            --bg-dark: #0b0f1a;
+            --card-bg: #1a1f2e;
+            --neon-blue: #42d1f5;
+            --premium-gold: #fbc02d;
+        }
+
+        body { 
+            background-color: var(--bg-dark);
+            color: white; 
+            font-family: 'Montserrat', sans-serif;
+            -webkit-user-select: none;
+            overflow-x: hidden; /* Sprečava horizontalni scroll */
+        }
+
+        /* Glavni kontejner kao na slici */
+        .app-container {
+            max-width: 450px; /* Širina telefona sa slike */
+            margin: 0 auto;
+            min-height: 100vh;
+            background: radial-gradient(circle at top right, #1e293b, #0b0f1a);
+        }
+
+        /* Glassmorphism efekat */
+        .glass-ui {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 28px;
+            overflow: hidden; /* Za lepe slike unutar kartica */
+        }
+
+        /* Dugmad u obliku pilule (Pill buttons) */
+        .btn-pill {
+            border-radius: 50px;
+            transition: all 0.3s ease;
+        }
+
+        .neon-shadow {
+            box-shadow: 0 10px 25px -5px rgba(66, 209, 245, 0.4);
+        }
+
+        .gold-shadow {
+            box-shadow: 0 10px 25px -5px rgba(251, 192, 45, 0.3);
+        }
+
+        .day-active {
+            background: var(--neon-blue);
+            color: #0b0f1a;
+            font-weight: 900;
+        }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+
+        /* Timer krug */
+        .timer-circle {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            border: 8px solid var(--card-bg);
+            border-top-color: var(--neon-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            font-weight: 900;
+            margin: 30px auto;
+            color: var(--neon-blue);
+            text-shadow: 0 0 15px rgba(66, 209, 245, 0.7);
+        }
+
+        .ex-image {
+            width: 100%;
+            height: 160px; /* Fiksna visina slike */
+            object-fit: cover; /* Pokriva celu površinu */
+            border-radius: 20px; /* Unutar kartice */
+            margin-bottom: 12px;
+        }
+
+        .video-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(5px);
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container pb-24">
+        
+        <header class="p-6 flex justify-between items-center">
+            <div class="flex flex-col">
+                <h1 class="text-2xl font-black italic tracking-tighter uppercase italic">
+                    ProFit <span style="color: var(--neon-blue);">Ultra</span>
+                </h1>
+                <div class="flex items-center space-x-2 mt-1">
+                    <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                    <span class="text-[10px] text-slate-400 font-bold tracking-widest uppercase" id="live-elite-status">Live Elite</span>
+                </div>
+            </div>
+            <div class="flex items-center space-x-3">
+                <button onclick="shareApp()" class="w-10 h-10 glass-ui flex items-center justify-center text-white/70">
+                    <i class="fas fa-paper-plane text-sm"></i>
+                </button>
+                <div onclick="showPremiumPanel()" id="premBadge" class="bg-amber-400 text-black text-[10px] font-black px-4 py-2 btn-pill cursor-pointer uppercase gold-shadow">
+                    Premium
+                </div>
+            </div>
+        </header>
+
+        <div class="px-6 grid grid-cols-3 gap-3 mb-8">
+            <div class="glass-ui p-4 text-center">
+                <p class="text-[8px] text-slate-500 font-black uppercase mb-1" id="l-exercises">Vežbi</p>
+                <p id="statTotal" class="text-xl font-black">0</p>
+            </div>
+            <div class="glass-ui p-4 text-center">
+                <p class="text-[8px] text-slate-500 font-black uppercase mb-1" id="l-kcal">Kcal</p>
+                <p id="statKcal" class="text-xl font-black text-orange-500">0</p>
+            </div>
+            <div class="glass-ui p-4 text-center">
+                <p class="text-[8px] text-slate-500 font-black uppercase mb-1" id="l-level">Nivo</p>
+                <p id="statLevel" class="text-xl font-black text-amber-400">1</p>
+            </div>
+        </div>
+
+        <div class="px-6 flex space-x-2 mb-6">
+            <button onclick="switchTab('workout')" id="tabW" class="flex-1 py-4 btn-pill font-black text-[11px] uppercase tracking-widest bg-white text-black shadow-xl">Trening</button>
+            <button onclick="switchTab('diet')" id="tabD" class="flex-1 py-4 btn-pill font-black text-[11px] uppercase tracking-widest glass-ui text-slate-400">Ishrana ⭐</button>
+        </div>
+
+        <div id="daySelector" class="flex space-x-3 px-6 mb-8 overflow-x-auto no-scrollbar"></div>
+
+        <main id="appBody" class="px-6 space-y-4"></main>
+
+    </div>
+
+    <div id="premiumPanel" class="fixed inset-0 bg-gradient-to-br from-[#0b0f1a] to-[#1e293b] z-[1000] hidden flex flex-col items-center justify-center p-8 text-center">
+        <div class="w-32 h-32 bg-amber-400 rounded-full flex items-center justify-center mb-8 gold-shadow relative">
+            <i class="fas fa-crown text-5xl text-black"></i>
+            <div class="absolute -inset-4 border border-amber-400/20 rounded-full animate-ping"></div>
+        </div>
+        
+        <h2 class="text-4xl font-black italic mb-2 uppercase" id="prem-title">ProFit <span class="text-[#42d1f5]">Ultra</span></h2>
+        <p class="text-slate-400 text-sm mb-12 px-6" id="prem-desc">Otključaj kompletan plan i 500+ premium vežbi za tvoju transformaciju.</p>
+        
+        <div class="text-6xl font-black mb-12 text-[#42d1f5] italic tracking-tighter">30.00€</div>
+        
+        <button onclick="payNow()" id="pay-button" class="w-full bg-[#42d1f5] text-black py-5 btn-pill font-black text-xl uppercase neon-shadow mb-8 transition-transform active:scale-95">
+            Plati PayPal-om
+        </button>
+        
+        <div class="w-full space-y-3">
+            <input type="text" id="activationCode" placeholder="UNESI KOD" class="w-full bg-white/5 border border-white/10 rounded-2xl p-5 outline-none text-center font-black tracking-[5px] text-[#42d1f5] uppercase">
+            <button onclick="checkCode()" id="activate-button" class="w-full text-amber-400 font-black text-xs uppercase tracking-widest py-2">Aktiviraj Pristup</button>
+        </div>
+        
+        <button onclick="hidePremiumPanel()" id="close-button" class="mt-12 text-slate-600 font-bold uppercase text-[10px] tracking-[3px]">Zatvori</button>
+    </div>
+
+    <div id="timerOverlay" class="fixed inset-0 bg-gradient-to-br from-[#0b0f1a] to-[#1e293b] z-[1100] hidden flex flex-col items-center justify-center p-10">
+        <h2 id="activeExName" class="text-3xl font-black text-center mb-8 uppercase italic text-[#42d1f5]">Vežba</h2>
+        <div class="timer-circle" id="timerDisplay">45</div>
+        <div class="w-full space-y-4 mt-10">
+            <button id="controlBtn" onclick="toggleTimer()" class="w-full bg-[#42d1f5] py-6 btn-pill font-black text-2xl uppercase neon-shadow transition-transform active:scale-95">START</button>
+            <button onclick="stopTimer()" id="stop-button" class="w-full text-slate-500 font-bold uppercase">Prekini</button>
+        </div>
+    </div>
+
+    <script>
+        // BAZA VEŽBI SA SLIKAMA I YOUTUBE LINKOVIMA
+        const exercisesData = {
+            pon: { 
+                name: { sr: "Grudi & Ramena", en: "Chest & Shoulders", de: "Brust & Schultern", it: "Petto & Spalle" }, 
+                list: [
+                    { sr: "Standardni Sklekovi", en: "Push-ups", de: "Liegestütze", it: "Flessioni", img: "https://t3.ftcdn.net/jpg/00/22/19/29/360_F_22192934_cM9aJ9Gf6XfN2D1fB0o2S5w9s9j8gN2U.jpg", yt: "https://youtu.be/IODxDxX7oi4" },
+                    { sr: "Dips na stolici", en: "Chair Dips", de: "Stuhldips", it: "Dips su Sedia", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Bench_Dip.jpg/1200px-Bench_Dip.jpg", yt: "https://youtu.be/03Y-PjF6JjU" },
+                    { sr: "Dijamant Sklekovi", en: "Diamond Push-ups", de: "Diamant-Liegestütze", it: "Piegamenti a Diamante", img: "https://i.ytimg.com/vi/J0Dhz-l6C8E/maxresdefault.jpg", yt: "https://youtu.be/J0Dhz-l6C8E" },
+                    { sr: "Pike Sklekovi", en: "Pike Push-ups", de: "Hecht-Liegestütze", it: "Piegamenti a Pike", img: "https://www.bodybuilding.com/images/2021/september/how-to-do-the-pike-pushup-header-900x506.jpg", yt: "https://youtu.be/Vp2F0jP1q7I" },
+                    { sr: "Rameni Potisak (Empty)", en: "Shoulder Press (Empty)", de: "Schulterpresse (Leer)", it: "Spinta Spalle (Vuoto)", img: "https://cdn.shopify.com/s/files/1/0250/2437/products/ShoulderPress_Hero_b5f7b8cf-81ff-484d-a169-c09a8f4c21e6_1200x.jpg?v=1603998960", yt: "https://youtu.be/qEwKCR5RN0Y" }
+                ]
+            },
+            uto: { 
+                name: { sr: "Leđa & Biceps", en: "Back & Biceps", de: "Rücken & Bizeps", it: "Schiena & Bicipiti" }, 
+                list: [
+                    { sr: "Superman", en: "Superman", de: "Superman", it: "Superman", img: "https://www.muscleandfitness.com/wp-content/uploads/2018/01/woman-superman-1109.jpg", yt: "https://youtu.be/z6PJ_L6b5p4" },
+                    { sr: "Bird-Dog", en: "Bird-Dog", de: "Bird-Dog", it: "Bird-Dog", img: "https://hips.hearstapps.com/hmg-prod/images/bird-dog-exercise-1650388741.jpeg", yt: "https://youtu.be/g0v2sP_t48w" },
+                    { sr: "Povlačenje peškirom", en: "Towel Rows", de: "Handtuchrudern", it: "Rematore con Asciugamano", img: "https://i.ytimg.com/vi/bX9f-LpW25I/maxresdefault.jpg", yt: "https://youtu.be/bX9f-LpW25I" },
+                    { sr: "Biceps pregib (Flaše)", en: "Bicep Curls (Bottles)", de: "Bizeps-Curls (Flaschen)", it: "Curl Bicipiti (Bottiglie)", img: "https://hips.hearstapps.com/hmg-prod/images/bicep-curl-0081-1582239634.jpg", yt: "https://youtu.be/s8K31sX4hJ4" }
+                ]
+            },
+            sre: { 
+                name: { sr: "Noge & Gluteus", en: "Legs & Glutes", de: "Beine & Po", it: "Gambe & Glutei" }, 
+                list: [
+                    { sr: "Čučnjevi", en: "Squats", de: "Kniebeugen", it: "Squat", img: "https://www.verywellfit.com/thmb/T1h6s4W2_qK9z_tS-kX6s4M1j9c=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/45-200-3492-Squat-56a2b85e5f9b58b7d0cd6500.jpg", yt: "https://youtu.be/ultWnrK3-80" },
+                    { sr: "Iskoraci", en: "Lunges", de: "Ausfallschritte", it: "Affondi", img: "https://blog.nasm.org/hubfs/Lunges.jpg", yt: "https://youtu.be/QO2tqBqX2Q8" },
+                    { sr: "Bugarski Čučanj", en: "Bulgarian Split Squats", de: "Bulgarische Kniebeugen", it: "Squat Bulgaro", img: "https://www.bodybuilding.com/images/2021/september/how-to-do-the-bulgarian-split-squat-header-900x506.jpg", yt: "https://youtu.be/2C-pupd5o5Q" },
+                    { sr: "Most", en: "Glute Bridge", de: "Gesäßbrücke", it: "Ponte Glutei", img: "https://hips.hearstapps.com/womenshealth-production.s3.amazonaws.com/images/7370/Glute_Bridge_Exercise.jpg", yt: "https://youtu.be/e0eN0D4e2b0" }
+                ]
+            },
+            cet: { 
+                name: { sr: "Trbušnjaci (Core)", en: "Abs (Core)", de: "Bauch (Rumpf)", it: "Addominali (Core)" }, 
+                list: [
+                    { sr: "Plank", en: "Plank", de: "Plank", it: "Plank", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Plank_exercise.jpg/1200px-Plank_exercise.jpg", yt: "https://youtu.be/AS5y35d5D68" },
+                    { sr: "Trbušnjaci (Crunches)", en: "Crunches", de: "Crunches", it: "Crunch", img: "https://www.verywellfit.com/thmb/pX6tYgVp3xW6l3E9B7t3_4o4R0A=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/81-3760920-Crunch-Primary-56a2b8425f9b58b7d0cd647b.jpg", yt: "https://youtu.be/Xy9k1tA8j9A" },
+                    { sr: "Ruski Twist", en: "Russian Twist", de: "Russian Twist", it: "Russian Twist", img: "https://blog.nasm.org/hubfs/RussianTwist-1.jpg", yt: "https://youtu.be/tyT2E5J44v0" },
+                    { sr: "Podizanje nogu", en: "Leg Raises", de: "Beinheben", it: "Sollevamento Gambe", img: "https://i.ytimg.com/vi/W4E5WzGkE0A/maxresdefault.jpg", yt: "https://youtu.be/W4E5WzGkE0A" }
+                ]
+            },
+            pet: { 
+                name: { sr: "HIIT Kardio", en: "HIIT Cardio", de: "HIIT Cardio", it: "Cardio HIIT" }, 
+                list: [
+                    { sr: "Burpees", en: "Burpees", de: "Burpees", it: "Burpees", img: "https://cdn.britannica.com/49/236149-050-9E11F651/burpee-exercise-performing-woman.jpg", yt: "https://youtu.be/dZgVk10L5eM" },
+                    { sr: "Jumping Jacks", en: "Jumping Jacks", de: "Jumping Jacks", it: "Jumping Jacks", img: "https://www.verywellfit.com/thmb/Uu9_9qT65k-tE7zE9Gg-s0m4p50=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/25--3494058-Jumping-Jack-56a2b7f35f9b58b7d0cd62dc.jpg", yt: "https://youtu.be/qJvS4n1Wf_g" },
+                    { sr: "Visoka kolena", en: "High Knees", de: "Hohe Knie", it: "Ginocchia Alte", img: "https://hips.hearstapps.com/hmg-prod/images/high-knees-exercise-1594917452.jpg", yt: "https://youtu.be/ea7z934bN1U" },
+                    { sr: "Brzi skip", en: "Fast Skips", de: "Schnelles Skippen", it: "Salto Rapido", img: "https://i.ytimg.com/vi/s1dM2Q1-n_A/maxresdefault.jpg", yt: "https://youtu.be/s1dM2Q1-n_A" }
+                ]
+            },
+            sub: { 
+                name: { sr: "Full Body Mix", en: "Full Body Mix", de: "Ganzkörper-Mix", it: "Mix Completo Corpo" }, 
+                list: [
+                    { sr: "Bear Crawl", en: "Bear Crawl", de: "Bärenkriechen", it: "Gattonare Orso", img: "https://blog.nasm.org/hubfs/Bear-Crawl.jpg", yt: "https://youtu.be/FmP0zYd4P74" },
+                    { sr: "Plank Jacks", en: "Plank Jacks", de: "Plank Jacks", it: "Plank Jacks", img: "https://www.bodybuilding.com/images/2021/september/how-to-do-the-plank-jack-header-900x506.jpg", yt: "https://youtu.be/N85p2d8W4eE" },
+                    { sr: "Spiderman sklek", en: "Spiderman Push-ups", de: "Spiderman-Liegestütze", it: "Piegamenti Spiderman", img: "https://i.ytimg.com/vi/Z0bE8y5_R6E/maxresdefault.jpg", yt: "https://youtu.be/Z0bE8y5_R6E" },
+                    { sr: "Čučanj sa rotacijom", en: "Squat with Twist", de: "Kniebeuge mit Drehung", it: "Squat con Torsione", img: "https://i.ytimg.com/vi/vF0a1r6n-28/maxresdefault.jpg", yt: "https://youtu.be/vF0a1r6n-28" }
+                ]
+            },
+            ned: { 
+                name: { sr: "Oporavak & Yoga", en: "Recovery & Yoga", de: "Erholung & Yoga", it: "Recupero & Yoga" }, 
+                list: [
+                    { sr: "Istezanje celog tela", en: "Full Body Stretch", de: "Ganzkörper-Dehnung", it: "Allungamento Completo", img: "https://www.verywellfit.com/thmb/x2N_76fQp9wN0J4G8m1C2B-N-6U=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/81-3498305-CalfStretch-56a2b7b53df78cf7727906d4.jpg", yt: "https://youtu.be/g7R07T9W2f4" },
+                    { sr: "Kobra poza", en: "Cobra Pose", de: "Kobra-Stellung", it: "Posizione del Cobra", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Bhujangasana.jpg/1200px-Bhujangasana.jpg", yt: "https://youtu.be/EsO87P0Gv9g" },
+                    { sr: "Poza deteta", en: "Child's Pose", de: "Kindeshaltung", it: "Posizione del Bambino", img: "https://www.verywellfit.com/thmb/M1L1W1g-y9_h5M_p6m8P6J5Y_p8=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/GettyImages-1200155076-90f7543f05ff4c99a0ed303a73c1d93d.jpg", yt: "https://youtu.be/2gQ4F4kE8kE" }
+                ]
+            }
+        };
+
+        const dietPlans = {
+            sr: [
+                { title: "Doručak", desc: "Ovsena kaša sa borovnicama, bademima i mericom whey proteina (450 kcal)" },
+                { title: "Ručak", desc: "Piletina (200g), pirinač (100g) i brokoli na pari (650 kcal)" },
+                { title: "Užina", desc: "Grčki jogurt sa medom i šaka oraha (200 kcal)" },
+                { title: "Večera", desc: "Omlet od 3 belanca, 1 žumanca sa svežom salatom (350 kcal)" }
+            ],
+            en: [
+                { title: "Breakfast", desc: "Oatmeal with blueberries, almonds and a scoop of whey protein (450 kcal)" },
+                { title: "Lunch", desc: "Chicken (200g), rice (100g) and steamed broccoli (650 kcal)" },
+                { title: "Snack", desc: "Greek yogurt with honey and a handful of walnuts (200 kcal)" },
+                { title: "Dinner", desc: "Omelette with 3 egg whites, 1 yolk and fresh salad (350 kcal)" }
+            ],
+            de: [
+                { title: "Frühstück", desc: "Haferbrei mit Blaubeeren, Mandeln und einem Messlöffel Molkenprotein (450 kcal)" },
+                { title: "Mittagessen", desc: "Hähnchen (200g), Reis (100g) und gedämpfter Brokkoli (650 kcal)" },
+                { title: "Snack", desc: "Griechischer Joghurt mit Honig und eine Handvoll Walnüsse (200 kcal)" },
+                { title: "Abendessen", desc: "Omelett mit 3 Eiweiß, 1 Eigelb und frischem Salat (350 kcal)" }
+            ],
+            it: [
+                { title: "Colazione", desc: "Farina d'avena con mirtilli, mandorle e un misurino di proteine del siero di latte (450 kcal)" },
+                { title: "Pranzo", desc: "Pollo (200g), riso (100g) e broccoli al vapore (650 kcal)" },
+                { title: "Spuntino", desc: "Yogurt greco con miele e una manciata di noci (200 kcal)" },
+                { title: "Cena", desc: "Omelette con 3 albumi, 1 tuorlo e insalata fresca (350 kcal)" }
+            ]
+        };
+
+        const uiTranslations = {
+            sr: {
+                liveStatus: "Live Elite", exercises: "Vežbi", kcal: "Kcal", level: "Nivo",
+                workout: "Trening", diet: "Ishrana ⭐", dietPremium: "Ishrana",
+                premTitle: "ProFit Ultra", premDesc: "Otključaj kompletan plan i 500+ premium vežbi za tvoju transformaciju.",
+                payBtn: "Plati PayPal-om", activateBtn: "Aktiviraj Pristup", closeBtn: "Zatvori",
+                dayNames: ["Pon", "Uto", "Sre", "Čet", "Pet", "Sub", "Ned"],
+                dailyExercises: "Dnevne Vežbe", seconds: "Sekundi", premiumLocked: "Premium Zaključano",
+                dietLockedTitle: "Plan Ishrane", dietLockedDesc: "Uplati 30€ i dobij personalizovan jelovnik.",
+                timerStart: "START", timerPause: "PAUZA", timerContinue: "NASTAVI", timerStop: "Prekini",
+                wrongCode: "Pogrešan kod!", success: "ULTRA PRISTUP AKTIVIRAN! ⭐"
+            },
+            en: {
+                liveStatus: "Live Elite", exercises: "Exercises", kcal: "Kcal", level: "Level",
+                workout: "Workout", diet: "Diet ⭐", dietPremium: "Diet",
+                premTitle: "ProFit Ultra", premDesc: "Unlock the complete plan and 500+ premium exercises for your transformation.",
+                payBtn: "Pay with PayPal", activateBtn: "Activate Access", closeBtn: "Close",
+                dayNames: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+                dailyExercises: "Daily Exercises", seconds: "Seconds", premiumLocked: "Premium Locked",
+                dietLockedTitle: "Diet Plan", dietLockedDesc: "Pay 30€ to get a personalized meal plan.",
+                timerStart: "START", timerPause: "PAUSE", timerContinue: "CONTINUE", timerStop: "Stop",
+                wrongCode: "Wrong code!", success: "ULTRA ACCESS ACTIVATED! ⭐"
+            },
+            de: {
+                liveStatus: "Live Elite", exercises: "Übungen", kcal: "Kcal", level: "Level",
+                workout: "Training", diet: "Ernährung ⭐", dietPremium: "Ernährung",
+                premTitle: "ProFit Ultra", premDesc: "Schalte den kompletten Plan und über 500 Premium-Übungen für deine Transformation frei.",
+                payBtn: "Mit PayPal bezahlen", activateBtn: "Zugang aktivieren", closeBtn: "Schließen",
+                dayNames: ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"],
+                dailyExercises: "Tägliche Übungen", seconds: "Sekunden", premiumLocked
